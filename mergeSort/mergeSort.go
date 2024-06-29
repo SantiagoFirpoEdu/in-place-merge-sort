@@ -4,7 +4,6 @@ import (
 	"sync"
 )
 
-// ParallelMerge function that merges two sorted slices using parallelism
 func parallelMerge(left, right []int, result []int, waitGroup *sync.WaitGroup) {
 	defer waitGroup.Done()
 	if len(left) == 0 {
@@ -76,7 +75,6 @@ func ParallelMergeSort(arr []int) []int {
 	return result
 }
 
-// ParallelMergeSort function that sorts an array using parallel merge sort
 func parallelMergeSort(array []int, waitGroup *sync.WaitGroup) []int {
 	defer waitGroup.Done()
 
