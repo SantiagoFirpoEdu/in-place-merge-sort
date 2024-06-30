@@ -1,12 +1,42 @@
 package mergeSortWithParallelMergeAndSplit
 
+import (
+	"fmt"
+	"sync"
+)
 
-func parallelMerge(left []int, right []int, result []int, waitChannel chan<- struct{}) {
-	defer func() {
-		waitChannel <- struct{}{}
-	}()
+const threshold = 1000 // Adjust this value based on experimentation
 
-	// If there's nothing to merge on either side, just copy the other side to the result
+func sequentialMerge(left []int, right []int, result []int) {
+	i, j, k := 0, 0, 0
+
+	for i < len(left) && j < len(right) {
+		if left[i] <= right[j] {
+			result[k] = left[i]
+			i++
+		} else {
+			result[k] = right[j]
+			j++
+		}
+		k++
+	}
+
+	for i < len(left) {
+		result[k] = left[i]
+		i++
+		k++
+	}
+
+	for j < len(right) {
+		result[k] = right[j]
+		j++
+		k++
+	}
+}
+
+func parallelMerge(left []int, right []int, result []int, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	if len(left) == 0 {
 		copy(result, right)
 		return
@@ -16,8 +46,7 @@ func parallelMerge(left []int, right []int, result []int, waitChannel chan<- str
 		return
 	}
 
-	// If the left side is smaller than the right side, swap them. Always do this to ensure the left side is shorter than the right side
-	if len(left) < len(right) {
+	if len(left) > len(right) {
 		left, right = right, left
 	}
 
@@ -27,14 +56,16 @@ func parallelMerge(left []int, right []int, result []int, waitChannel chan<- str
 	resultMid := middle + otherMiddle
 	result[resultMid] = left[middle]
 
-	leftWaitChannel := make(chan struct{}, 1)
-	rightWaitChannel := make(chan struct{}, 1)
+	var leftWG, rightWG sync.WaitGroup
 
-	go parallelMerge(left[:middle], right[:otherMiddle], result[:resultMid], leftWaitChannel)
-	parallelMerge(left[middle+1:], right[otherMiddle:], result[resultMid+1:], rightWaitChannel)
+	leftWG.Add(1)
+	go parallelMerge(left[:middle], right[:otherMiddle], result[:resultMid], &leftWG)
 
-	<-leftWaitChannel
-	<-rightWaitChannel
+	rightWG.Add(1)
+	go parallelMerge(left[middle+1:], right[otherMiddle:], result[resultMid+1:], &rightWG)
+
+	leftWG.Wait()
+	rightWG.Wait()
 }
 
 // Returns the index of the first element in the array that is greater than or equal to the target
@@ -52,28 +83,67 @@ func binarySearch(array []int, target int) int {
 }
 
 func MergeSort(arr []int) []int {
-	resultChannel := make(chan []int, 1)
-	parallelMergeSort(arr, resultChannel)
-	return <-resultChannel
+	if len(arr) <= 1 {
+		return arr
+	}
+
+	result := make([]int, len(arr))
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+
+	go parallelMergeSort(arr, result, wg)
+
+	wg.Wait()
+	return result
 }
 
-func parallelMergeSort(array []int, resultChannel chan<- []int) {
-	if len(array) <= 1 {
-		resultChannel <- array
+func parallelMergeSort(array []int, result []int, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	if len(array) <= threshold {
+		sequentialMergeSort(array, result)
 		return
 	}
 
 	mid := len(array) / 2
 
-	leftMergeChannel := make(chan []int, 1)
-	go parallelMergeSort(array[:mid], leftMergeChannel)
-	rightMergeChannel := make(chan []int, 1)
-	parallelMergeSort(array[mid:], rightMergeChannel)
+	left := array[:mid]
+	right := array[mid:]
 
-	result := make([]int, len(array))
-	mergeWaitChannel := make(chan struct{}, 1)
-	parallelMerge(<-leftMergeChannel, <-rightMergeChannel, result, mergeWaitChannel)
-	<-mergeWaitChannel
+	leftResult := make([]int, len(left))
+	rightResult := make([]int, len(right))
 
-	resultChannel <- result
+	var leftWG, rightWG sync.WaitGroup
+
+	leftWG.Add(1)
+	go parallelMergeSort(left, leftResult, &leftWG)
+
+	rightWG.Add(1)
+	parallelMergeSort(right, rightResult, &rightWG)
+
+	leftWG.Wait()
+	rightWG.Wait()
+
+	sequentialMerge(leftResult, rightResult, result)
+}
+
+func sequentialMergeSort(array []int, result []int) {
+	if len(array) <= 1 {
+		copy(result, array)
+		return
+	}
+
+	mid := len(array) / 2
+	left := make([]int, mid)
+	right := make([]int, len(array)-mid)
+
+	sequentialMergeSort(array[:mid], left)
+	sequentialMergeSort(array[mid:], right)
+	sequentialMerge(left, right, result)
+}
+
+func main() {
+	arr := []int{38, 27, 43, 3, 9, 82, 10}
+	sorted := MergeSort(arr)
+	fmt.Println(sorted)
 }
