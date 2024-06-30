@@ -2,14 +2,13 @@ package main
 
 import (
 	"fmt"
-	"parallel-merge-sort/mergeSort"
+	"parallel-merge-sort/mergeSort/mergeSortWithParallelMergeAndSplit"
+	"parallel-merge-sort/mergeSort/mergeSortWithParallelSplit"
 )
 
 func main() {
-	arr := []int{38, 27, 43, 3, 9, 82, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-	fmt.Println("Original array:", arr)
-
-	sortedArr := mergeSort.ParallelMergeSort(arr)
-
-	fmt.Println("Sorted array:", sortedArr)
+	arrayToSort := []int{903943, 38, 27, 43, 3, 9, 82, 10, 1, 2, 3, 4, 5, 6, 7, 9, 10}
+	fmt.Println(arrayToSort, "original array")
+	fmt.Println(mergeSortWithParallelMergeAndSplit.ParallelMergeSort(arrayToSort), "(Parallel Merge Sort with Parallel Merge and Split, sorted array)")
+	fmt.Println(mergeSortWithParallelSplit.ParallelMergeSort(arrayToSort), "(Parallel Merge Sort with Parallel Split, sorted array)")
 }

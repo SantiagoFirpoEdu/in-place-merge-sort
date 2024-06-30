@@ -1,7 +1,7 @@
 package main
 
 import (
-	"parallel-merge-sort/mergeSort"
+	"parallel-merge-sort/mergeSort/mergeSortWithParallelMergeAndSplit"
 	"testing"
 )
 
@@ -18,6 +18,6 @@ func BenchmarkParallelMergeSort(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		b.ResetTimer()
 		array := []int{38, 27, 43, 3, 9, 82, 10}
-		mergeSort.ParallelMergeSort(array)
+		mergeSortWithParallelMergeAndSplit.mergeSort.ParallelMergeSort(array)
 	}
 }
