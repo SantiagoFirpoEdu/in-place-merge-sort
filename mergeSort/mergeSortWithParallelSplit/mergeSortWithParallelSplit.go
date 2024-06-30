@@ -16,33 +16,34 @@ func ParallelMergeSort(array []int) []int {
 }
 
 func merge(left []int, right []int, result []int) {
-	i := 0
-	j := 0
-	k := 0
+	leftCurrentIndex := 0
+	rightCurrentIndex := 0
+	currentIndexInResult := 0
 
 	// Merge the two slices while both have elements
-	for i < len(left) && j < len(right) {
-		if left[i] <= right[j] {
-			result[k] = left[i]
-			i++
+	for leftCurrentIndex < len(left) && rightCurrentIndex < len(right) {
+		if left[leftCurrentIndex] <= right[rightCurrentIndex] {
+			result[currentIndexInResult] = left[leftCurrentIndex]
+			leftCurrentIndex++
 		} else {
-			result[k] = right[j]
-			j++
+			result[currentIndexInResult] = right[rightCurrentIndex]
+			rightCurrentIndex++
 		}
-		k++
+		currentIndexInResult++
 	}
 
+	//Only one of the following loops will run
 	// Consume remaining elements of left slice, if any
-	for i < len(left) {
-		result[k] = left[i]
-		i++
-		k++
+	for leftCurrentIndex < len(left) {
+		result[currentIndexInResult] = left[leftCurrentIndex]
+		leftCurrentIndex++
+		currentIndexInResult++
 	}
 
 	// Consume remaining elements of right slice, if any
-	for j < len(right) {
-		result[k] = right[j]
-		j++
-		k++
+	for rightCurrentIndex < len(right) {
+		result[currentIndexInResult] = right[rightCurrentIndex]
+		rightCurrentIndex++
+		currentIndexInResult++
 	}
 }
