@@ -1,4 +1,4 @@
-package utils
+package main
 
 import (
 	"fmt"
@@ -6,7 +6,6 @@ import (
 	"parallel-merge-sort/mergeSort/mergeSortWithParallelMergeAndSplit"
 	"parallel-merge-sort/mergeSort/mergeSortWithParallelSplit"
 	"parallel-merge-sort/utils"
-	"runtime"
 	"slices"
 	"sort"
 	"time"
@@ -19,7 +18,6 @@ func main() {
 }
 
 func testMergeSorts(size int) {
-	runtime.GOMAXPROCS(1)
 	arrayToSort := utils.GenerateDecreasingArray(size)
 	start := time.Now()
 	mergeSortSequential.MergeSort(arrayToSort)
