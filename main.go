@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	arrayToSort := generateDecreasingArray(1000000)
+	arrayToSort := generateDecreasingArray(10000000)
 	mergeSortWithParallelMergeAndSplit.ParallelMergeSort(arrayToSort)
 	fmt.Println("Finished sorting")
 }
