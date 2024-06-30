@@ -50,7 +50,7 @@ func binarySearch(array []int, target int) int {
 	return start
 }
 
-func ParallelMergeSort(arr []int) []int {
+func MergeSort(arr []int) []int {
 	resultChannel := make(chan []int, 1)
 	parallelMergeSort(arr, resultChannel)
 	return <-resultChannel

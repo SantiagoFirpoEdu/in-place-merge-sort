@@ -11,7 +11,7 @@ func BenchmarkMergeSortWithParallelMergeAndSplit(b *testing.B) {
 	array := []int{38, 27, 43, 3, 9, 82, 10}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		mergeSortWithParallelMergeAndSplit.ParallelMergeSort(array)
+		mergeSortWithParallelMergeAndSplit.MergeSort(array)
 	}
 }
 
