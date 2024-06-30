@@ -17,7 +17,7 @@ func parallelMergeSort(array []int, outChannel chan<- []int) {
 	go parallelMergeSort(array[:middle], leftChannel)
 
 	rightChannel := make(chan []int, 1)
-	go parallelMergeSort(array[middle:], rightChannel)
+	parallelMergeSort(array[middle:], rightChannel)
 
 	result := make([]int, len(array))
 	merge(<-leftChannel, <-rightChannel, result)
