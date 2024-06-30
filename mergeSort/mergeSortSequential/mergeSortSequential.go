@@ -1,28 +1,18 @@
-package mergeSortWithParallelSplit
+package mergeSortSequential
 
 func MergeSort(array []int) []int {
-	outChannel := make(chan []int, 1)
-	parallelMergeSort(array, outChannel)
-	return <-outChannel
-}
-
-func parallelMergeSort(array []int, outChannel chan<- []int) {
 	if len(array) <= 1 {
-		outChannel <- array
-		return
+		return array
 	}
 
 	middle := len(array) / 2
-	leftChannel := make(chan []int, 1)
-	go parallelMergeSort(array[:middle], leftChannel)
-
-	rightChannel := make(chan []int, 1)
-	go parallelMergeSort(array[middle:], rightChannel)
+	left := MergeSort(array[:middle])
+	right := MergeSort(array[middle:])
 
 	result := make([]int, len(array))
-	merge(<-leftChannel, <-rightChannel, result)
+	merge(left, right, result)
 
-	outChannel <- result
+	return result
 }
 
 func merge(left []int, right []int, result []int) {

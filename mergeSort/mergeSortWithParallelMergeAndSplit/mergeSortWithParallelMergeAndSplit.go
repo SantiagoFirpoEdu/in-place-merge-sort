@@ -1,6 +1,6 @@
 package mergeSortWithParallelMergeAndSplit
 
-func parallelMerge(left []int, right []int, result []int, waitChannel chan<- struct{}) {
+func mergeSort(left []int, right []int, result []int, waitChannel chan<- struct{}) {
 	defer func() {
 		waitChannel <- struct{}{}
 	}()
@@ -29,8 +29,8 @@ func parallelMerge(left []int, right []int, result []int, waitChannel chan<- str
 	leftWaitChannel := make(chan struct{}, 1)
 	rightWaitChannel := make(chan struct{}, 1)
 
-	go parallelMerge(left[:middle], right[:otherMiddle], result[:resultMid], leftWaitChannel)
-	go parallelMerge(left[middle+1:], right[otherMiddle:], result[resultMid+1:], rightWaitChannel)
+	go mergeSort(left[:middle], right[:otherMiddle], result[:resultMid], leftWaitChannel)
+	go mergeSort(left[middle+1:], right[otherMiddle:], result[resultMid+1:], rightWaitChannel)
 
 	<-leftWaitChannel
 	<-rightWaitChannel
@@ -75,7 +75,7 @@ func parallelMergeSort(array []int, resultChannel chan<- []int) {
 
 	result := make([]int, len(array))
 	mergeWaitChannel := make(chan struct{}, 1)
-	parallelMerge(<-leftMergeChannel, <-rightMergeChannel, result, mergeWaitChannel)
+	mergeSort(<-leftMergeChannel, <-rightMergeChannel, result, mergeWaitChannel)
 	<-mergeWaitChannel
 
 	resultChannel <- result
