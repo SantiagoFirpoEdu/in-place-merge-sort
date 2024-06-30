@@ -1,10 +1,11 @@
-package main
+package utils
 
 import (
 	"fmt"
 	"parallel-merge-sort/mergeSort/mergeSortSequential"
 	"parallel-merge-sort/mergeSort/mergeSortWithParallelMergeAndSplit"
 	"parallel-merge-sort/mergeSort/mergeSortWithParallelSplit"
+	"parallel-merge-sort/utils"
 	"runtime"
 	"slices"
 	"sort"
@@ -19,7 +20,7 @@ func main() {
 
 func testMergeSorts(size int) {
 	runtime.GOMAXPROCS(1)
-	arrayToSort := generateDecreasingArray(size)
+	arrayToSort := utils.GenerateDecreasingArray(size)
 	start := time.Now()
 	mergeSortSequential.MergeSort(arrayToSort)
 	sequentialMergeSortDuration := time.Since(start).Microseconds()
@@ -50,12 +51,4 @@ func testMergeSorts(size int) {
 	mergeSortWithParallelMergeAndSplit.MergeSort(arrayToSort)
 	parallelMergeAndSplitDuration := time.Since(startParallelMergeAndSplit).Microseconds()
 	fmt.Println("Finished sorting with parallel merge and split in", parallelMergeAndSplitDuration, "us")
-}
-
-func generateDecreasingArray(size int) []int {
-	array := make([]int, size)
-	for i := 0; i < size; i++ {
-		array[i] = size - i
-	}
-	return array
 }
