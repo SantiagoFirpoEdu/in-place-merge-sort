@@ -73,30 +73,30 @@ func sequentialMergeSort(array []int, result []int) {
 }
 
 func sequentialMerge(left []int, right []int, result []int) {
-	i := 0
-	j := 0
-	k := 0
+	leftPointer := 0
+	rightPointer := 0
+	resultPointer := 0
 
-	for i < len(left) && j < len(right) {
-		if left[i] <= right[j] {
-			result[k] = left[i]
-			i++
+	for leftPointer < len(left) && rightPointer < len(right) {
+		if left[leftPointer] <= right[rightPointer] {
+			result[resultPointer] = left[leftPointer]
+			leftPointer++
 		} else {
-			result[k] = right[j]
-			j++
+			result[resultPointer] = right[rightPointer]
+			rightPointer++
 		}
-		k++
+		resultPointer++
 	}
 
-	for i < len(left) {
-		result[k] = left[i]
-		i++
-		k++
+	for leftPointer < len(left) {
+		result[resultPointer] = left[leftPointer]
+		leftPointer++
+		resultPointer++
 	}
 
-	for j < len(right) {
-		result[k] = right[j]
-		j++
-		k++
+	for rightPointer < len(right) {
+		result[resultPointer] = right[rightPointer]
+		rightPointer++
+		resultPointer++
 	}
 }

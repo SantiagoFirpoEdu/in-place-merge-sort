@@ -1,8 +1,8 @@
 package main
 
 import (
+	"parallel-merge-sort/mergeSort/mergeSortParallelInPlace"
 	"parallel-merge-sort/mergeSort/mergeSortSequential"
-	"parallel-merge-sort/mergeSort/mergeSortWithParallelMergeAndSplit"
 	"parallel-merge-sort/mergeSort/mergeSortWithParallelSplit"
 	"parallel-merge-sort/utils"
 	"sort"
@@ -14,7 +14,7 @@ func BenchmarkMergeSortWithParallelMergeAndSplit(b *testing.B) {
 	array := []int{38, 27, 43, 3, 9, 82, 10}
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		mergeSortWithParallelMergeAndSplit.MergeSort(array)
+		mergeSortParallelInPlace.MergeSort(array)
 	}
 }
 
@@ -71,19 +71,19 @@ func TestSequentialMergeSort(t *testing.T) {
 func TestParallelMergeAndSplitMergeSort(t *testing.T) {
 	size1 := 10
 	arrayToSort1 := utils.GenerateDecreasingArray(size1)
-	parallelResult1 := mergeSortWithParallelMergeAndSplit.MergeSort(arrayToSort1)
+	parallelResult1 := mergeSortParallelInPlace.MergeSort(arrayToSort1)
 
 	size2 := 100
 	arrayToSort2 := utils.GenerateDecreasingArray(size2)
-	parallelResult2 := mergeSortWithParallelMergeAndSplit.MergeSort(arrayToSort2)
+	parallelResult2 := mergeSortParallelInPlace.MergeSort(arrayToSort2)
 
 	size3 := 300
 	arrayToSort3 := utils.GenerateDecreasingArray(size3)
-	parallelResult3 := mergeSortWithParallelMergeAndSplit.MergeSort(arrayToSort3)
+	parallelResult3 := mergeSortParallelInPlace.MergeSort(arrayToSort3)
 
 	size4 := 1000
 	arrayToSort4 := utils.GenerateDecreasingArray(size4)
-	parallelResult4 := mergeSortWithParallelMergeAndSplit.MergeSort(arrayToSort4)
+	parallelResult4 := mergeSortParallelInPlace.MergeSort(arrayToSort4)
 
 	if !sort.IsSorted(sort.IntSlice(parallelResult1)) {
 		t.Errorf("Parallel merge and split merge sort is not sorted")

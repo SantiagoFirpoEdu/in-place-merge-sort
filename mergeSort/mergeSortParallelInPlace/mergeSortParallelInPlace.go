@@ -1,4 +1,4 @@
-package mergeSortWithParallelMergeAndSplit
+package mergeSortParallelInPlace
 
 import (
 	"sync"

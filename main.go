@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"parallel-merge-sort/mergeSort/mergeSortParallelInPlace"
 	"parallel-merge-sort/mergeSort/mergeSortSequential"
-	"parallel-merge-sort/mergeSort/mergeSortWithParallelMergeAndSplit"
 	"parallel-merge-sort/mergeSort/mergeSortWithParallelSplit"
 	"parallel-merge-sort/utils"
 	"slices"
@@ -56,7 +56,7 @@ func testParallelMergeSorts(size int) {
 	fmt.Println("[Parallel Split] Finished in", parallelSplitDuration, "s")
 
 	startParallelMergeAndSplit := time.Now()
-	mergeSortWithParallelMergeAndSplit.MergeSort(arrayToSort)
+	mergeSortParallelInPlace.MergeSort(arrayToSort)
 	parallelMergeAndSplitDuration := time.Since(startParallelMergeAndSplit).Seconds()
-	fmt.Println("[Parallel Merge and Split] Finished in", parallelMergeAndSplitDuration, "s")
+	fmt.Println("[Parallel Merge In Place] Finished in", parallelMergeAndSplitDuration, "s")
 }
