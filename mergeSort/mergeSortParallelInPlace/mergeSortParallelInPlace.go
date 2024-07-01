@@ -33,55 +33,6 @@ func sequentialMerge(left []int, right []int, result []int) {
 	}
 }
 
-func parallelMerge(left []int, right []int, result []int, wg *sync.WaitGroup) {
-	defer wg.Done()
-
-	if len(left) == 0 {
-		copy(result, right)
-		return
-	}
-	if len(right) == 0 {
-		copy(result, left)
-		return
-	}
-
-	if len(left) > len(right) {
-		left, right = right, left
-	}
-
-	middle := len(left) / 2
-	otherMiddle := binarySearch(right, left[middle])
-
-	resultMid := middle + otherMiddle
-	result[resultMid] = left[middle]
-
-	var leftWaitGroup sync.WaitGroup
-	var rightWaitGroup sync.WaitGroup
-
-	leftWaitGroup.Add(1)
-	go parallelMerge(left[:middle], right[:otherMiddle], result[:resultMid], &leftWaitGroup)
-
-	rightWaitGroup.Add(1)
-	go parallelMerge(left[middle+1:], right[otherMiddle:], result[resultMid+1:], &rightWaitGroup)
-
-	leftWaitGroup.Wait()
-	rightWaitGroup.Wait()
-}
-
-// Returns the index of the first element in the array that is greater than or equal to the target
-func binarySearch(array []int, target int) int {
-	start, end := 0, len(array)
-	for start < end {
-		middle := (start + end) / 2
-		if array[middle] < target {
-			start = middle + 1
-		} else {
-			end = middle
-		}
-	}
-	return start
-}
-
 func MergeSort(arr []int) []int {
 	if len(arr) <= 1 {
 		return arr
