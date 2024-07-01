@@ -110,8 +110,8 @@ func parallelMergeSort(array []int, result []int, wg *sync.WaitGroup) {
 	left := array[:mid]
 	right := array[mid:]
 
-	leftResult := make([]int, len(left))
-	rightResult := make([]int, len(right))
+	leftResult := result[:mid]
+	rightResult := result[mid:]
 
 	var leftWG, rightWG sync.WaitGroup
 
