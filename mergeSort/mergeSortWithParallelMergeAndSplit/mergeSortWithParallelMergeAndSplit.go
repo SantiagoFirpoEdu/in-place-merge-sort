@@ -1,11 +1,10 @@
 package mergeSortWithParallelMergeAndSplit
 
 import (
-	"fmt"
 	"sync"
 )
 
-const threshold = 1000 // Adjust this value based on experimentation
+const threshold = 1000 //Threshold used to decide when to switch to sequential merge sort, adjust this value based on experimentation
 
 func sequentialMerge(left []int, right []int, result []int) {
 	i, j, k := 0, 0, 0
@@ -56,16 +55,17 @@ func parallelMerge(left []int, right []int, result []int, wg *sync.WaitGroup) {
 	resultMid := middle + otherMiddle
 	result[resultMid] = left[middle]
 
-	var leftWG, rightWG sync.WaitGroup
+	var leftWaitGroup sync.WaitGroup
+	var rightWaitGroup sync.WaitGroup
 
-	leftWG.Add(1)
-	go parallelMerge(left[:middle], right[:otherMiddle], result[:resultMid], &leftWG)
+	leftWaitGroup.Add(1)
+	go parallelMerge(left[:middle], right[:otherMiddle], result[:resultMid], &leftWaitGroup)
 
-	rightWG.Add(1)
-	go parallelMerge(left[middle+1:], right[otherMiddle:], result[resultMid+1:], &rightWG)
+	rightWaitGroup.Add(1)
+	go parallelMerge(left[middle+1:], right[otherMiddle:], result[resultMid+1:], &rightWaitGroup)
 
-	leftWG.Wait()
-	rightWG.Wait()
+	leftWaitGroup.Wait()
+	rightWaitGroup.Wait()
 }
 
 // Returns the index of the first element in the array that is greater than or equal to the target
@@ -105,24 +105,25 @@ func parallelMergeSort(array []int, result []int, wg *sync.WaitGroup) {
 		return
 	}
 
-	mid := len(array) / 2
+	middle := len(array) / 2
 
-	left := array[:mid]
-	right := array[mid:]
+	left := array[:middle]
+	right := array[middle:]
 
-	leftResult := result[:mid]
-	rightResult := result[mid:]
+	leftResult := result[:middle]
+	rightResult := result[middle:]
 
-	var leftWG, rightWG sync.WaitGroup
+	var leftWaitGroup sync.WaitGroup
+	var rightWaitGroup sync.WaitGroup
 
-	leftWG.Add(1)
-	go parallelMergeSort(left, leftResult, &leftWG)
+	leftWaitGroup.Add(1)
+	go parallelMergeSort(left, leftResult, &leftWaitGroup)
 
-	rightWG.Add(1)
-	parallelMergeSort(right, rightResult, &rightWG)
+	rightWaitGroup.Add(1)
+	parallelMergeSort(right, rightResult, &rightWaitGroup)
 
-	leftWG.Wait()
-	rightWG.Wait()
+	leftWaitGroup.Wait()
+	rightWaitGroup.Wait()
 
 	sequentialMerge(leftResult, rightResult, result)
 }
@@ -133,17 +134,11 @@ func sequentialMergeSort(array []int, result []int) {
 		return
 	}
 
-	mid := len(array) / 2
-	left := make([]int, mid)
-	right := make([]int, len(array)-mid)
+	middle := len(array) / 2
+	left := make([]int, middle)
+	right := make([]int, len(array)-middle)
 
-	sequentialMergeSort(array[:mid], left)
-	sequentialMergeSort(array[mid:], right)
+	sequentialMergeSort(array[:middle], left)
+	sequentialMergeSort(array[middle:], right)
 	sequentialMerge(left, right, result)
-}
-
-func main() {
-	arr := []int{38, 27, 43, 3, 9, 82, 10}
-	sorted := MergeSort(arr)
-	fmt.Println(sorted)
 }
