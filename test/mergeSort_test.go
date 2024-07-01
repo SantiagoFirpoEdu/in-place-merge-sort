@@ -43,7 +43,7 @@ func TestSequentialMergeSort(t *testing.T) {
 	}
 }
 
-func TestParallelMergeAndSplitMergeSort(t *testing.T) {
+func TestParallelMergeSortInPlace(t *testing.T) {
 	size1 := 10
 	arrayToSort1 := utils.GenerateDecreasingArray(size1)
 	parallelResult1 := mergeSortParallelInPlace.MergeSort(arrayToSort1)
@@ -77,7 +77,7 @@ func TestParallelMergeAndSplitMergeSort(t *testing.T) {
 	}
 }
 
-func TestParallelSplitMergeSort(t *testing.T) {
+func TestParallelMergeSort(t *testing.T) {
 	size1 := 10
 	arrayToSort1 := utils.GenerateDecreasingArray(size1)
 	parallelResult1 := mergeSortWithParallelSplit.MergeSort(arrayToSort1)
