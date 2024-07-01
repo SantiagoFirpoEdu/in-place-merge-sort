@@ -2,7 +2,6 @@ package mergeSortWithParallelSplit
 
 import (
 	"runtime"
-	"sync"
 )
 
 const threshold = 1000 // Threshold used to decide when to switch to sequential merge sort, adjust this value based on experimentation
@@ -16,17 +15,12 @@ func MergeSort(array []int) []int {
 	runtime.GOMAXPROCS(numCPU)
 
 	outChannel := make(chan []int, 1)
-	wg := &sync.WaitGroup{}
-	wg.Add(1)
-	go parallelMergeSort(array, outChannel, wg)
-	wg.Wait()
+	go parallelMergeSort(array, outChannel)
 
 	return <-outChannel
 }
 
-func parallelMergeSort(array []int, outChannel chan<- []int, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func parallelMergeSort(array []int, outChannel chan<- []int) {
 	if len(array) <= threshold {
 		result := make([]int, len(array))
 		sequentialMergeSort(array, result)
@@ -39,17 +33,9 @@ func parallelMergeSort(array []int, outChannel chan<- []int, wg *sync.WaitGroup)
 	leftChannel := make(chan []int, 1)
 	rightChannel := make(chan []int, 1)
 
-	var leftWaitGroup sync.WaitGroup
-	var rightWaitGroup sync.WaitGroup
+	go parallelMergeSort(array[:middle], leftChannel)
 
-	leftWaitGroup.Add(1)
-	go parallelMergeSort(array[:middle], leftChannel, &leftWaitGroup)
-
-	rightWaitGroup.Add(1)
-	go parallelMergeSort(array[middle:], rightChannel, &rightWaitGroup)
-
-	leftWaitGroup.Wait()
-	rightWaitGroup.Wait()
+	go parallelMergeSort(array[middle:], rightChannel)
 
 	result := make([]int, len(array))
 	sequentialMerge(<-leftChannel, <-rightChannel, result)
