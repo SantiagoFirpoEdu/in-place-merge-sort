@@ -1,59 +1,102 @@
 package mergeSortWithParallelSplit
 
+import (
+	"runtime"
+	"sync"
+)
+
+const threshold = 1000 // Threshold used to decide when to switch to sequential merge sort, adjust this value based on experimentation
+
 func MergeSort(array []int) []int {
+	if len(array) <= 1 {
+		return array
+	}
+
+	numCPU := runtime.NumCPU()
+	runtime.GOMAXPROCS(numCPU)
+
 	outChannel := make(chan []int, 1)
-	parallelMergeSort(array, outChannel)
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	go parallelMergeSort(array, outChannel, wg)
+	wg.Wait()
+
 	return <-outChannel
 }
 
-func parallelMergeSort(array []int, outChannel chan<- []int) {
-	if len(array) <= 1 {
-		outChannel <- array
+func parallelMergeSort(array []int, outChannel chan<- []int, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	if len(array) <= threshold {
+		result := make([]int, len(array))
+		sequentialMergeSort(array, result)
+		outChannel <- result
 		return
 	}
 
 	middle := len(array) / 2
-	leftChannel := make(chan []int, 1)
-	go parallelMergeSort(array[:middle], leftChannel)
 
+	leftChannel := make(chan []int, 1)
 	rightChannel := make(chan []int, 1)
-	parallelMergeSort(array[middle:], rightChannel)
+
+	var leftWaitGroup sync.WaitGroup
+	var rightWaitGroup sync.WaitGroup
+
+	leftWaitGroup.Add(1)
+	go parallelMergeSort(array[:middle], leftChannel, &leftWaitGroup)
+
+	rightWaitGroup.Add(1)
+	go parallelMergeSort(array[middle:], rightChannel, &rightWaitGroup)
+
+	leftWaitGroup.Wait()
+	rightWaitGroup.Wait()
 
 	result := make([]int, len(array))
-	merge(<-leftChannel, <-rightChannel, result)
+	sequentialMerge(<-leftChannel, <-rightChannel, result)
 
 	outChannel <- result
 }
 
-func merge(left []int, right []int, result []int) {
-	leftCurrentIndex := 0
-	rightCurrentIndex := 0
-	currentIndexInResult := 0
+func sequentialMergeSort(array []int, result []int) {
+	if len(array) <= 1 {
+		copy(result, array)
+		return
+	}
 
-	// Merge the two slices while both have elements
-	for leftCurrentIndex < len(left) && rightCurrentIndex < len(right) {
-		if left[leftCurrentIndex] <= right[rightCurrentIndex] {
-			result[currentIndexInResult] = left[leftCurrentIndex]
-			leftCurrentIndex++
+	mid := len(array) / 2
+	left := make([]int, mid)
+	right := make([]int, len(array)-mid)
+
+	sequentialMergeSort(array[:mid], left)
+	sequentialMergeSort(array[mid:], right)
+	sequentialMerge(left, right, result)
+}
+
+func sequentialMerge(left []int, right []int, result []int) {
+	i := 0
+	j := 0
+	k := 0
+
+	for i < len(left) && j < len(right) {
+		if left[i] <= right[j] {
+			result[k] = left[i]
+			i++
 		} else {
-			result[currentIndexInResult] = right[rightCurrentIndex]
-			rightCurrentIndex++
+			result[k] = right[j]
+			j++
 		}
-		currentIndexInResult++
+		k++
 	}
 
-	//Only one of the following loops will run
-	// Consume remaining elements of left slice, if any
-	for leftCurrentIndex < len(left) {
-		result[currentIndexInResult] = left[leftCurrentIndex]
-		leftCurrentIndex++
-		currentIndexInResult++
+	for i < len(left) {
+		result[k] = left[i]
+		i++
+		k++
 	}
 
-	// Consume remaining elements of right slice, if any
-	for rightCurrentIndex < len(right) {
-		result[currentIndexInResult] = right[rightCurrentIndex]
-		rightCurrentIndex++
-		currentIndexInResult++
+	for j < len(right) {
+		result[k] = right[j]
+		j++
+		k++
 	}
 }
