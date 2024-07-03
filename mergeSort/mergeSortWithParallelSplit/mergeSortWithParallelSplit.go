@@ -1,18 +1,11 @@
 package mergeSortWithParallelSplit
 
-import (
-	"runtime"
-)
-
 const threshold = 1000 // Threshold used to decide when to switch to sequential merge sort, adjust this value based on experimentation
 
 func MergeSort(array []int) []int {
 	if len(array) <= 1 {
 		return array
 	}
-
-	numCPU := runtime.NumCPU()
-	runtime.GOMAXPROCS(numCPU)
 
 	outChannel := make(chan []int, 1)
 	go parallelMergeSort(array, outChannel)
